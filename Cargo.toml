@@ -1,0 +1,40 @@
+[package]
+name = "grid_shapes"
+version = "0.1.0"
+authors = ["Wes Feldsine <laocoon7@gmail.com>"]
+edition = "2021"
+license = "MIT OR Apache-2.0"
+description = "A general purpose 2d grid shape library"
+# repository
+# homepage
+# documentation
+# keywords
+# categories
+readme = "./README.md"
+
+[features]
+default = [
+    "coord_2d",
+    "grid_2d",
+]
+
+coord_2d = ["dep:coord_2d"]
+grid_2d = ["dep:grid_2d"]
+
+serde = [
+    "dep:serde",
+    "coord_2d/serialize",
+    "grid_2d/serialize",
+]
+
+
+[dependencies]
+coord_2d = { version = "0.3", optional = true } # A general purpose 2d coordinate
+grid_2d = { version = "0.15", optional = true } # A general purpose 2d grid
+
+serde = { version = "1", optional = true } # A generic serialization/deserialization framework
+
+# [[example]]
+# name = "test"
+# path = "examples/test.rs"
+# required-features = []
