@@ -1,4 +1,4 @@
-use crate::units::{Coord, Size};
+use crate::{units::{Coord, Size}, iters::rectangle::{RectangleIter, RectangleBorderIter}};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -82,12 +82,28 @@ impl<C: Coord, S: Size> Rectangle<C, S> {
 
 // Iterators
 impl<C: Coord, S: Size> Rectangle<C, S> {
+    pub fn border_iter(self) -> RectangleBorderIter<C> {
+        RectangleBorderIter::new(self.position, self.size)
+    }
+
     pub fn for_each<F: FnMut(C)>(self, mut f: F) {
-        for y in self.bottom()..=self.top() {
-            for x in self.left()..=self.right() {
-                f(C::new(x, y));
-            }
+        for coord in self {
+            f(coord);
         }
+    }
+
+    pub fn for_each_border<F: FnMut(C)>(self, mut f: F) {
+        for coord in self.border_iter() {
+            f(coord);
+        }
+    }
+}
+
+impl<C: Coord, S: Size> IntoIterator for Rectangle<C, S> {
+    type IntoIter = RectangleIter<C>;
+    type Item = C;
+    fn into_iter(self) -> Self::IntoIter {
+        RectangleIter::new(self.position, self.size)
     }
 }
 
@@ -237,5 +253,20 @@ mod tests {
                 Coord::new(1, 1)
             ]
         );
+    }
+
+    #[test]
+    fn test_into_iter() {
+        let rect = Rectangle::<Coord, Size>::new(0, 0, 1, 1);
+        let points: Vec<Coord> = rect.into_iter().collect();
+        assert_eq!(
+            points,
+            vec![
+                Coord::new(0, 0),
+                Coord::new(1, 0),
+                Coord::new(0, 1),
+                Coord::new(1, 1),
+            ]
+        )
     }
 }
