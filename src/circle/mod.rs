@@ -48,17 +48,12 @@ impl<C: Coord> Circle<C> {
         C::new(self.center.x(), self.center.y() - self.radius as i32)
     }
 
-    // FIX: PERF??
     pub fn get_count(self) -> u32 {
-        self.get_positions().len() as u32
+        self.into_iter().count() as u32
     }
 
     pub fn contains(self, position: C) -> bool {
-        self.get_positions().contains(&position)
-    }
-
-    fn get_positions(self) -> Vec<C> {
-        self.into_iter().collect()
+        self.into_iter().find(|&c| c == position).is_some()
     }
 }
 
