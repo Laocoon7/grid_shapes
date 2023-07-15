@@ -14,12 +14,17 @@ readme = "./README.md"
 
 [features]
 default = [
-    "coord_2d",
     "grid_2d",
 ]
 
-coord_2d = ["dep:coord_2d"]
-grid_2d = ["dep:grid_2d"]
+coord_2d = [
+    "dep:coord_2d",
+]
+
+grid_2d = [
+    "coord_2d",
+    "dep:grid_2d",
+]
 
 serde = [
     "dep:serde",

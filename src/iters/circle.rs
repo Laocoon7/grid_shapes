@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use crate::{Coord, line::Line};
+use crate::{line::Line, Coord};
 
 use super::line::BresenhamLineIter;
 
@@ -38,7 +38,7 @@ pub struct CircleIter<C: Coord> {
     line: Option<BresenhamLineIter<C>>,
 }
 
-impl<C: Coord> CircleIter<C>  {
+impl<C: Coord> CircleIter<C> {
     pub fn new(center: C, radius: u32) -> Self {
         Self {
             center,
@@ -61,7 +61,7 @@ impl<C: Coord> CircleIter<C>  {
                     return Some(p);
                 } else {
                     // Already seen this one, move on
-                    return self.try_continue_line()
+                    return self.try_continue_line();
                 }
             }
         }
@@ -72,13 +72,37 @@ impl<C: Coord> CircleIter<C>  {
     fn try_next_line(&mut self) -> Option<BresenhamLineIter<C>> {
         let line = match self.step {
             // Pick Line1
-            CircleIterStep::Line1 => Some(Line::new(C::new(self.center.x() + self.x, self.center.y() + self.y), C::new(self.center.x() + self.x, self.center.y() - self.y)).into_iter()),
+            CircleIterStep::Line1 => Some(
+                Line::new(
+                    C::new(self.center.x() + self.x, self.center.y() + self.y),
+                    C::new(self.center.x() + self.x, self.center.y() - self.y),
+                )
+                .into_iter(),
+            ),
             // Pick Line2
-            CircleIterStep::Line2 => Some(Line::new(C::new(self.center.x() - self.x, self.center.y() + self.y), C::new(self.center.x() - self.x, self.center.y() - self.y)).into_iter()),
+            CircleIterStep::Line2 => Some(
+                Line::new(
+                    C::new(self.center.x() - self.x, self.center.y() + self.y),
+                    C::new(self.center.x() - self.x, self.center.y() - self.y),
+                )
+                .into_iter(),
+            ),
             // Pick Line3
-            CircleIterStep::Line3 => Some(Line::new(C::new(self.center.x() + self.y, self.center.y() + self.x), C::new(self.center.x() + self.y, self.center.y() - self.x)).into_iter()),
+            CircleIterStep::Line3 => Some(
+                Line::new(
+                    C::new(self.center.x() + self.y, self.center.y() + self.x),
+                    C::new(self.center.x() + self.y, self.center.y() - self.x),
+                )
+                .into_iter(),
+            ),
             // Pick Line4
-            CircleIterStep::Line4 => Some(Line::new(C::new(self.center.x() - self.y, self.center.y() + self.x), C::new(self.center.x() - self.y, self.center.y() - self.x)).into_iter()),
+            CircleIterStep::Line4 => Some(
+                Line::new(
+                    C::new(self.center.x() - self.y, self.center.y() + self.x),
+                    C::new(self.center.x() - self.y, self.center.y() - self.x),
+                )
+                .into_iter(),
+            ),
             // Process for next lines
             CircleIterStep::Process => {
                 if self.d < 0 {
@@ -88,7 +112,7 @@ impl<C: Coord> CircleIter<C>  {
                     self.y -= 1;
                 }
                 self.x += 1;
-    
+
                 // Check if we are finished
                 if self.x > self.y {
                     self.step = CircleIterStep::Finished;
@@ -129,7 +153,7 @@ impl<C: Coord> Iterator for CircleIter<C> {
             // Set it as the active line
             self.line = Some(line);
             // try again
-            return self.next()
+            return self.next();
         }
 
         // couldn't get the next line
@@ -178,7 +202,7 @@ pub struct CircleCircumferenceIter<C: Coord> {
     step: CircleCircumferenceIterStep,
 }
 
-impl<C: Coord> CircleCircumferenceIter<C>  {
+impl<C: Coord> CircleCircumferenceIter<C> {
     pub fn new(center: C, radius: u32) -> Self {
         Self {
             center,
@@ -192,14 +216,30 @@ impl<C: Coord> CircleCircumferenceIter<C>  {
 
     fn try_next_point(&mut self) -> Option<C> {
         let c = match self.step {
-            CircleCircumferenceIterStep::Line1 => Some(C::new(self.center.x() + self.x, self.center.y() + self.y)),
-            CircleCircumferenceIterStep::Line2 => Some(C::new(self.center.x() + self.x, self.center.y() - self.y)),
-            CircleCircumferenceIterStep::Line3 => Some(C::new(self.center.x() - self.x, self.center.y() + self.y)),
-            CircleCircumferenceIterStep::Line4 => Some(C::new(self.center.x() - self.x, self.center.y() - self.y)),
-            CircleCircumferenceIterStep::Line5 => Some(C::new(self.center.x() + self.y, self.center.y() + self.x)),
-            CircleCircumferenceIterStep::Line6 => Some(C::new(self.center.x() + self.y, self.center.y() - self.x)),
-            CircleCircumferenceIterStep::Line7 => Some(C::new(self.center.x() - self.y, self.center.y() + self.x)),
-            CircleCircumferenceIterStep::Line8 => Some(C::new(self.center.x() - self.y, self.center.y() - self.x)),
+            CircleCircumferenceIterStep::Line1 => {
+                Some(C::new(self.center.x() + self.x, self.center.y() + self.y))
+            }
+            CircleCircumferenceIterStep::Line2 => {
+                Some(C::new(self.center.x() + self.x, self.center.y() - self.y))
+            }
+            CircleCircumferenceIterStep::Line3 => {
+                Some(C::new(self.center.x() - self.x, self.center.y() + self.y))
+            }
+            CircleCircumferenceIterStep::Line4 => {
+                Some(C::new(self.center.x() - self.x, self.center.y() - self.y))
+            }
+            CircleCircumferenceIterStep::Line5 => {
+                Some(C::new(self.center.x() + self.y, self.center.y() + self.x))
+            }
+            CircleCircumferenceIterStep::Line6 => {
+                Some(C::new(self.center.x() + self.y, self.center.y() - self.x))
+            }
+            CircleCircumferenceIterStep::Line7 => {
+                Some(C::new(self.center.x() - self.y, self.center.y() + self.x))
+            }
+            CircleCircumferenceIterStep::Line8 => {
+                Some(C::new(self.center.x() - self.y, self.center.y() - self.x))
+            }
             CircleCircumferenceIterStep::Process => {
                 if self.d < 0 {
                     self.d += (2 * self.x) + 1;
@@ -217,7 +257,7 @@ impl<C: Coord> CircleCircumferenceIter<C>  {
 
                 self.step = self.step.next();
                 return self.try_next_point();
-            },
+            }
             CircleCircumferenceIterStep::Finished => None,
         };
 

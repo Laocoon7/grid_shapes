@@ -1,4 +1,4 @@
-use crate::{Size, Coord};
+use crate::{Coord, Size};
 
 #[derive(Debug, Clone)]
 pub struct RectangleIter<C: Coord> {
@@ -9,7 +9,10 @@ pub struct RectangleIter<C: Coord> {
 
 impl<C: Coord> RectangleIter<C> {
     pub fn new<S: Size>(position: C, size: S) -> Self {
-        let max_offset = C::new(position.x() + size.width() as i32, position.y() + size.height() as i32);
+        let max_offset = C::new(
+            position.x() + size.width() as i32,
+            position.y() + size.height() as i32,
+        );
 
         Self {
             offset: C::new(0, 0),
@@ -48,8 +51,11 @@ pub struct RectangleBorderIter<C: Coord> {
 
 impl<C: Coord> RectangleBorderIter<C> {
     pub fn new<S: Size>(position: C, size: S) -> Self {
-        let max_offset = C::new(position.x() + size.width() as i32, position.y() + size.height() as i32);
-        
+        let max_offset = C::new(
+            position.x() + size.width() as i32,
+            position.y() + size.height() as i32,
+        );
+
         Self {
             offset: C::new(0, 0),
             max_offset,

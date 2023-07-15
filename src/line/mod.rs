@@ -1,9 +1,11 @@
-use crate::{Coord, iters::line::BresenhamLineIter};
+use std::fmt::{Debug, Display};
+
+use crate::{iters::line::{BresenhamLineIter, TunnelHorizontalVerticalLineIter, TunnelVerticalHorizontalLineIter}, units::Shape, Coord};
 
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Line<C: Coord> {
     pub start: C,
@@ -13,17 +15,17 @@ pub struct Line<C: Coord> {
 // Constructors
 impl<C: Coord> Line<C> {
     pub fn new(start: C, end: C) -> Self {
-        Self {
-            start,
-            end,
-        }
+        Self { start, end }
     }
 }
 
 // Implementation
 impl<C: Coord> Line<C> {
     pub fn len(self) -> u32 {
-        (self.end.x() - self.start.x()).abs().max((self.end.y() - self.start.y()).abs()) as u32 + 1
+        (self.end.x() - self.start.x())
+            .abs()
+            .max((self.end.y() - self.start.y()).abs()) as u32
+            + 1
     }
 
     pub fn start(self) -> C {
@@ -35,9 +37,32 @@ impl<C: Coord> Line<C> {
     }
 }
 
-// Iterators
+// Iterator
 impl<C: Coord> Line<C> {
-    pub fn for_each<F: FnMut(C)>(self, mut f: F) {
+    pub fn tunnel_horizontal_vertical_iter(self) -> TunnelHorizontalVerticalLineIter<C> {
+        TunnelHorizontalVerticalLineIter::new(self.start, self.end)
+    }
+
+    pub fn tunnel_vertical_horizontal_iter(self) -> TunnelVerticalHorizontalLineIter<C> {
+        TunnelVerticalHorizontalLineIter::new(self.start, self.end)
+    }
+
+    pub fn for_each_tunnel_horizontal_vertical<F: FnMut(C)>(self, mut f: F) {
+        for coord in self.tunnel_horizontal_vertical_iter() {
+            f(coord);
+        }
+    }
+
+    pub fn for_each_tunnel_vertical_horizontal<F: FnMut(C)>(self, mut f: F) {
+        for coord in self.tunnel_vertical_horizontal_iter() {
+            f(coord);
+        }
+    }
+}
+
+// Shape
+impl<C: Coord> Shape<C> for Line<C> {
+    fn for_each<F: FnMut(C)>(self, mut f: F) {
         for coord in self {
             f(coord);
         }
@@ -58,6 +83,32 @@ impl<C: Coord> Default for Line<C> {
             start: C::new(0, 0),
             end: C::new(1, 0),
         }
+    }
+}
+
+impl<C: Coord> Debug for Line<C> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "Line {{ start: ({}, {}), end: ({}, {}) }}",
+            self.start.x(),
+            self.start.y(),
+            self.end.x(),
+            self.end.y()
+        )
+    }
+}
+
+impl<C: Coord> Display for Line<C> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "Line {{\n\tstart: ({}, {}),\n\tend: ({}, {}),\n}}",
+            self.start.x(),
+            self.start.y(),
+            self.end.x(),
+            self.end.y()
+        )
     }
 }
 
@@ -96,7 +147,6 @@ mod test {
         assert_eq!(line.len(), len())
     }
 
-    
     #[test]
     fn test_for_each() {
         let line = line_new();
@@ -104,11 +154,7 @@ mod test {
         line.for_each(|point| points.push(point));
         assert_eq!(
             points,
-            vec![
-                Coord::new(0, 0),
-                Coord::new(1, 1),
-                Coord::new(2, 2)
-            ]
+            vec![Coord::new(0, 0), Coord::new(1, 1), Coord::new(2, 2)]
         );
     }
 
@@ -118,12 +164,7 @@ mod test {
         let points: Vec<Coord> = line.into_iter().collect();
         assert_eq!(
             points,
-            vec![
-                Coord::new(0, 0),
-                Coord::new(1, 1),
-                Coord::new(2, 2)
-            ]
+            vec![Coord::new(0, 0), Coord::new(1, 1), Coord::new(2, 2)]
         );
     }
-
 }

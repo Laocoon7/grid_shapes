@@ -1,9 +1,15 @@
-use crate::{Coord, iters::circle::{CircleIter, CircleCircumferenceIter}};
+use std::fmt::{Debug, Display};
+
+use crate::{
+    iters::circle::{CircleCircumferenceIter, CircleIter},
+    units::Shape,
+    Coord,
+};
 
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Circle<C: Coord> {
     pub center: C,
@@ -14,10 +20,7 @@ pub struct Circle<C: Coord> {
 impl<C: Coord> Circle<C> {
     /// Creates a new circle.
     pub fn new(center: C, radius: u32) -> Self {
-        Self {
-            center,
-            radius,
-        }
+        Self { center, radius }
     }
 }
 
@@ -42,7 +45,7 @@ impl<C: Coord> Circle<C> {
     pub fn top(self) -> C {
         C::new(self.center.x(), self.center.y() + self.radius as i32)
     }
-    
+
     /// Get the bottom point of the circle
     pub fn bottom(self) -> C {
         C::new(self.center.x(), self.center.y() - self.radius as i32)
@@ -63,14 +66,17 @@ impl<C: Coord> Circle<C> {
         CircleCircumferenceIter::new(self.center, self.radius)
     }
 
-    pub fn for_each<F: FnMut(C)>(self, mut f: F) {
-        for coord in self {
+    pub fn for_each_circumference<F: FnMut(C)>(self, mut f: F) {
+        for coord in self.circumference_iter() {
             f(coord);
         }
     }
+}
 
-    pub fn for_each_circumference<F: FnMut(C)>(self, mut f: F) {
-        for coord in self.circumference_iter() {
+// Shape
+impl<C: Coord> Shape<C> for Circle<C> {
+    fn for_each<F: FnMut(C)>(self, mut f: F) {
+        for coord in self {
             f(coord);
         }
     }
@@ -90,5 +96,29 @@ impl<C: Coord> Default for Circle<C> {
             center: C::new(0, 0),
             radius: 1,
         }
+    }
+}
+
+impl<C: Coord> Debug for Circle<C> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "Circle {{ center: ({}, {}), radius: {} }}",
+            self.center.x(),
+            self.center.y(),
+            self.radius
+        )
+    }
+}
+
+impl<C: Coord> Display for Circle<C> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "Circle {{\n\tcenter: ({}, {}),\n\tradius: {},\n}}",
+            self.center.x(),
+            self.center.y(),
+            self.radius
+        )
     }
 }

@@ -1,8 +1,13 @@
-use crate::{units::{Coord, Size}, iters::rectangle::{RectangleIter, RectangleBorderIter}};
+use std::fmt::{Debug, Display};
+
+use crate::{
+    iters::rectangle::{RectangleBorderIter, RectangleIter},
+    units::{Coord, Shape, Size},
+};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Rectangle<C: Coord, S: Size> {
     pub position: C,
@@ -86,14 +91,17 @@ impl<C: Coord, S: Size> Rectangle<C, S> {
         RectangleBorderIter::new(self.position, self.size)
     }
 
-    pub fn for_each<F: FnMut(C)>(self, mut f: F) {
-        for coord in self {
+    pub fn for_each_border<F: FnMut(C)>(self, mut f: F) {
+        for coord in self.border_iter() {
             f(coord);
         }
     }
+}
 
-    pub fn for_each_border<F: FnMut(C)>(self, mut f: F) {
-        for coord in self.border_iter() {
+// Shape
+impl<C: Coord, S: Size> Shape<C> for Rectangle<C, S> {
+    fn for_each<F: FnMut(C)>(self, mut f: F) {
+        for coord in self {
             f(coord);
         }
     }
@@ -113,6 +121,32 @@ impl<C: Coord, S: Size> Default for Rectangle<C, S> {
             position: Coord::new(0, 0),
             size: Size::new(1, 1),
         }
+    }
+}
+
+impl<C: Coord, S: Size> Debug for Rectangle<C, S> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "Rectangle {{ position: ({}, {}), size: ({}, {}) }}",
+            self.position.x(),
+            self.position.y(),
+            self.size.width(),
+            self.size.height()
+        )
+    }
+}
+
+impl<C: Coord, S: Size> Display for Rectangle<C, S> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "Rectangle {{\n\tposition: ({}, {}),\n\tsize: ({}, {})\n}}",
+            self.position.x(),
+            self.position.y(),
+            self.size.width(),
+            self.size.height()
+        )
     }
 }
 
