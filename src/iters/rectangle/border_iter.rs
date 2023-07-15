@@ -31,7 +31,8 @@ impl<C: Coord> Iterator for RectangleBorderIter<C> {
 
         let p = self.offset;
 
-        if self.offset.y() == 0 || self.offset.y() == self.max_offset.y() {
+        // Fill in top and bottom lines
+        if self.offset.y() == 0 || self.offset.y() == self.max_offset.y() - 1 {
             self.offset.set_x(self.offset.x() + 1);
 
             if self.offset.x() >= self.max_offset.x() {
