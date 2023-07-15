@@ -73,6 +73,10 @@ impl<C: Coord, S: Size> Rectangle<C, S> {
         self.position.y()
     }
 
+    pub fn center(self) -> C {
+        C::new((self.right() + self.left()) / 2, (self.top() + self.bottom()) / 2)
+    }
+
     pub fn is_square(self) -> bool {
         self.width() == self.height()
     }
