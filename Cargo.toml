@@ -5,11 +5,11 @@ authors = ["Wes Feldsine <laocoon7@gmail.com>"]
 edition = "2021"
 license = "MIT OR Apache-2.0"
 description = "A general purpose 2d grid shape library"
-# repository
-# homepage
+repository = "https://github.com/Laocoon7/grid_shapes"
+homepage = "https://github.com/Laocoon7/grid_shapes"
 # documentation
-# keywords
-# categories
+keywords = ["grid", "shapes", "tile", "2d", "coord", "coordinate"]
+categories = ["algorithms", "data structures", "game development"]
 readme = "./README.md"
 
 [features]
