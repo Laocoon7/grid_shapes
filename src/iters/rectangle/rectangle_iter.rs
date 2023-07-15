@@ -10,8 +10,8 @@ pub struct RectangleIter<C: Coord> {
 impl<C: Coord> RectangleIter<C> {
     pub fn new<S: Size>(position: C, size: S) -> Self {
         let max_offset = C::new(
-            position.x() + size.width() as i32,
-            position.y() + size.height() as i32,
+            size.width() as i32,
+            size.height() as i32,
         );
 
         Self {
