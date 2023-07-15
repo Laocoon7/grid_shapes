@@ -9,7 +9,7 @@ repository = "https://github.com/Laocoon7/grid_shapes"
 homepage = "https://github.com/Laocoon7/grid_shapes"
 # documentation
 keywords = ["grid", "shapes", "tile", "2d", "coordinate"]
-categories = ["algorithms", "data structures", "game development"]
+categories = ["algorithms", "data-structures", "game-development"]
 readme = "./README.md"
 
 [features]
