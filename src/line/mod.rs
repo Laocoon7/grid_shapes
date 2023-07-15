@@ -1,6 +1,12 @@
 use std::fmt::{Debug, Display};
 
-use crate::{iters::line::{BresenhamLineIter, TunnelHorizontalVerticalLineIter, TunnelVerticalHorizontalLineIter}, units::Shape, Coord};
+use crate::{
+    iters::line::{
+        BresenhamLineIter, TunnelHorizontalVerticalLineIter, TunnelVerticalHorizontalLineIter,
+    },
+    units::Shape,
+    Coord,
+};
 
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};

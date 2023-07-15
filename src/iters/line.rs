@@ -1,7 +1,7 @@
 mod bresenham;
 pub use self::bresenham::*;
-pub(crate) mod octant;
 mod linear;
+pub(crate) mod octant;
 pub use self::linear::*;
 mod tunnel_horizontal_vertical;
 pub use self::tunnel_horizontal_vertical::*;

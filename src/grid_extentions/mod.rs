@@ -22,7 +22,7 @@ impl<T: Copy> ShapeGridExtensions<T> for Grid<T> {
     }
 
     fn copy_from_rectangle_border(&mut self, rectangle: Rectangle, offset: Coord, value: T) {
-        rectangle.for_each(|coord| {
+        rectangle.for_each_border(|coord| {
             let position = Coord::new(coord.x + offset.x, coord.y + offset.y);
             if let Some(grid_value) = self.get_mut(position) {
                 *grid_value = value;
