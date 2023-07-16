@@ -15,13 +15,13 @@ pub mod grid_extentions;
 pub mod prelude {
     // Circles
     #[cfg(feature = "coord_2d")]
-    pub type Circle = crate::circle::Circle<coord_2d::Coord>;
+    pub type Circle = crate::circle::Circle<coord_2d::Coord, coord_2d::Size>;
     #[cfg(not(feature = "coord_2d"))]
     pub use crate::circle::Circle;
 
     // Lines
     #[cfg(feature = "coord_2d")]
-    pub type Line = crate::line::Line<coord_2d::Coord>;
+    pub type Line = crate::line::Line<coord_2d::Coord, coord_2d::Size>;
     #[cfg(not(feature = "coord_2d"))]
     pub use crate::line::Line;
 

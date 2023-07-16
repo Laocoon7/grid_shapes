@@ -1,9 +1,9 @@
-use std::fmt::{Debug, Display};
+use std::{fmt::{Debug, Display}, marker::PhantomData};
 
 use crate::{
     iters::circle::{CircleCircumferenceIter, CircleIter},
     units::Shape,
-    Coord,
+    Coord, Size, rectangle::Rectangle,
 };
 
 #[cfg(feature = "serde")]
@@ -11,21 +11,23 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct Circle<C: Coord> {
+pub struct Circle<C: Coord, S: Size> {
     pub center: C,
     pub radius: u32,
+
+    _phantom: PhantomData<S>,
 }
 
 // Constructors
-impl<C: Coord> Circle<C> {
+impl<C: Coord, S: Size> Circle<C, S> {
     /// Creates a new circle.
     pub fn new(center: C, radius: u32) -> Self {
-        Self { center, radius }
+        Self { center, radius, _phantom: PhantomData }
     }
 }
 
 // Imnplementation
-impl<C: Coord> Circle<C> {
+impl<C: Coord, S: Size> Circle<C, S> {
     /// Get the center of the circle
     pub const fn center(self) -> C {
         self.center
@@ -61,8 +63,8 @@ impl<C: Coord> Circle<C> {
 }
 
 // Iterators
-impl<C: Coord> Circle<C> {
-    pub fn circumference_iter(self) -> CircleCircumferenceIter<C> {
+impl<C: Coord, S: Size> Circle<C, S> {
+    pub fn circumference_iter(self) -> CircleCircumferenceIter<C, S> {
         CircleCircumferenceIter::new(self.center, self.radius)
     }
 
@@ -74,32 +76,42 @@ impl<C: Coord> Circle<C> {
 }
 
 // Shape
-impl<C: Coord> Shape<C> for Circle<C> {
+impl<C: Coord, S: Size> Shape<C, S> for Circle<C, S> {
     fn for_each<F: FnMut(C)>(self, mut f: F) {
         for coord in self {
             f(coord);
         }
     }
+
+    fn aabb(self) -> Rectangle<C, S> {
+        Rectangle::new(
+            self.center.x() - self.radius as i32,
+            self.center.y() - self.radius as i32,
+            self.center.x() + self.radius as i32,
+            self.center.y() + self.radius as i32,
+        )
+    }
 }
 
-impl<C: Coord> IntoIterator for Circle<C> {
-    type IntoIter = CircleIter<C>;
+impl<C: Coord, S: Size> IntoIterator for Circle<C, S> {
+    type IntoIter = CircleIter<C, S>;
     type Item = C;
     fn into_iter(self) -> Self::IntoIter {
         CircleIter::new(self.center, self.radius)
     }
 }
 
-impl<C: Coord> Default for Circle<C> {
+impl<C: Coord, S: Size> Default for Circle<C, S> {
     fn default() -> Self {
         Self {
             center: C::new(0, 0),
             radius: 1,
+            _phantom: PhantomData,
         }
     }
 }
 
-impl<C: Coord> Debug for Circle<C> {
+impl<C: Coord, S: Size> Debug for Circle<C, S> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
@@ -111,7 +123,7 @@ impl<C: Coord> Debug for Circle<C> {
     }
 }
 
-impl<C: Coord> Display for Circle<C> {
+impl<C: Coord, S: Size> Display for Circle<C, S> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,

@@ -103,11 +103,15 @@ impl<C: Coord, S: Size> Rectangle<C, S> {
 }
 
 // Shape
-impl<C: Coord, S: Size> Shape<C> for Rectangle<C, S> {
+impl<C: Coord, S: Size> Shape<C, S> for Rectangle<C, S> {
     fn for_each<F: FnMut(C)>(self, mut f: F) {
         for coord in self {
             f(coord);
         }
+    }
+
+    fn aabb(self) -> Rectangle<C, S> {
+        self
     }
 }
 

@@ -1,11 +1,11 @@
-use std::fmt::{Debug, Display};
+use std::{fmt::{Debug, Display}, marker::PhantomData};
 
 use crate::{
     iters::line::{
         BresenhamLineIter, TunnelHorizontalVerticalLineIter, TunnelVerticalHorizontalLineIter,
     },
     units::Shape,
-    Coord,
+    Coord, rectangle::Rectangle, Size,
 };
 
 #[cfg(feature = "serde")]
@@ -13,20 +13,22 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct Line<C: Coord> {
+pub struct Line<C: Coord, S: Size> {
     pub start: C,
     pub end: C,
+
+    _phantom: PhantomData<S>,
 }
 
 // Constructors
-impl<C: Coord> Line<C> {
+impl<C: Coord, S: Size> Line<C, S> {
     pub fn new(start: C, end: C) -> Self {
-        Self { start, end }
+        Self { start, end, _phantom: PhantomData }
     }
 }
 
 // Implementation
-impl<C: Coord> Line<C> {
+impl<C: Coord, S: Size> Line<C, S> {
     pub fn len(self) -> u32 {
         (self.end.x() - self.start.x())
             .abs()
@@ -44,7 +46,7 @@ impl<C: Coord> Line<C> {
 }
 
 // Iterator
-impl<C: Coord> Line<C> {
+impl<C: Coord, S: Size> Line<C, S> {
     pub fn tunnel_horizontal_vertical_iter(self) -> TunnelHorizontalVerticalLineIter<C> {
         TunnelHorizontalVerticalLineIter::new(self.start, self.end)
     }
@@ -67,15 +69,19 @@ impl<C: Coord> Line<C> {
 }
 
 // Shape
-impl<C: Coord> Shape<C> for Line<C> {
+impl<C: Coord, S: Size> Shape<C, S> for Line<C, S> {
     fn for_each<F: FnMut(C)>(self, mut f: F) {
         for coord in self {
             f(coord);
         }
     }
+
+    fn aabb(self) -> Rectangle<C, S> {
+        Rectangle::from_corners(self.start, self.end)
+    }
 }
 
-impl<C: Coord> IntoIterator for Line<C> {
+impl<C: Coord, S: Size> IntoIterator for Line<C, S> {
     type IntoIter = BresenhamLineIter<C>;
     type Item = C;
     fn into_iter(self) -> Self::IntoIter {
@@ -83,16 +89,17 @@ impl<C: Coord> IntoIterator for Line<C> {
     }
 }
 
-impl<C: Coord> Default for Line<C> {
+impl<C: Coord, S: Size> Default for Line<C, S> {
     fn default() -> Self {
         Self {
             start: C::new(0, 0),
             end: C::new(1, 0),
+            _phantom: PhantomData,
         }
     }
 }
 
-impl<C: Coord> Debug for Line<C> {
+impl<C: Coord, S: Size> Debug for Line<C, S> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
@@ -105,7 +112,7 @@ impl<C: Coord> Debug for Line<C> {
     }
 }
 
-impl<C: Coord> Display for Line<C> {
+impl<C: Coord, S: Size> Display for Line<C, S> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
@@ -122,7 +129,7 @@ impl<C: Coord> Display for Line<C> {
 #[cfg(test)]
 mod test {
     use super::*;
-    use coord_2d::Coord;
+    use coord_2d::{Coord, Size};
 
     fn start() -> Coord {
         Coord::new(0, 0)
@@ -136,7 +143,7 @@ mod test {
         3
     }
 
-    fn line_new() -> Line<Coord> {
+    fn line_new() -> Line<Coord, Size> {
         Line::new(start(), end())
     }
 

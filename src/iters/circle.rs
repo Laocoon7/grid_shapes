@@ -1,6 +1,6 @@
-use std::collections::HashSet;
+use std::{collections::HashSet, marker::PhantomData};
 
-use crate::{line::Line, Coord};
+use crate::{line::Line, Coord, Size};
 
 use super::line::BresenhamLineIter;
 
@@ -28,7 +28,7 @@ impl CircleIterStep {
 }
 
 #[derive(Debug, Clone)]
-pub struct CircleIter<C: Coord> {
+pub struct CircleIter<C: Coord, S: Size> {
     center: C,
     discovered: HashSet<C>,
     d: i32,
@@ -36,9 +36,11 @@ pub struct CircleIter<C: Coord> {
     y: i32,
     step: CircleIterStep,
     line: Option<BresenhamLineIter<C>>,
+
+    _phantom: PhantomData<S>,
 }
 
-impl<C: Coord> CircleIter<C> {
+impl<C: Coord, S: Size> CircleIter<C, S> {
     pub fn new(center: C, radius: u32) -> Self {
         Self {
             center,
@@ -48,6 +50,8 @@ impl<C: Coord> CircleIter<C> {
             y: radius as i32,
             step: CircleIterStep::Line1,
             line: None,
+
+            _phantom: PhantomData,
         }
     }
 
@@ -73,7 +77,7 @@ impl<C: Coord> CircleIter<C> {
         let line = match self.step {
             // Pick Line1
             CircleIterStep::Line1 => Some(
-                Line::new(
+                Line::<C, S>::new(
                     C::new(self.center.x() + self.x, self.center.y() + self.y),
                     C::new(self.center.x() + self.x, self.center.y() - self.y),
                 )
@@ -81,7 +85,7 @@ impl<C: Coord> CircleIter<C> {
             ),
             // Pick Line2
             CircleIterStep::Line2 => Some(
-                Line::new(
+                Line::<C, S>::new(
                     C::new(self.center.x() - self.x, self.center.y() + self.y),
                     C::new(self.center.x() - self.x, self.center.y() - self.y),
                 )
@@ -89,7 +93,7 @@ impl<C: Coord> CircleIter<C> {
             ),
             // Pick Line3
             CircleIterStep::Line3 => Some(
-                Line::new(
+                Line::<C, S>::new(
                     C::new(self.center.x() + self.y, self.center.y() + self.x),
                     C::new(self.center.x() + self.y, self.center.y() - self.x),
                 )
@@ -97,7 +101,7 @@ impl<C: Coord> CircleIter<C> {
             ),
             // Pick Line4
             CircleIterStep::Line4 => Some(
-                Line::new(
+                Line::<C, S>::new(
                     C::new(self.center.x() - self.y, self.center.y() + self.x),
                     C::new(self.center.x() - self.y, self.center.y() - self.x),
                 )
@@ -135,7 +139,7 @@ impl<C: Coord> CircleIter<C> {
     }
 }
 
-impl<C: Coord> Iterator for CircleIter<C> {
+impl<C: Coord, S: Size> Iterator for CircleIter<C, S> {
     type Item = C;
     fn next(&mut self) -> Option<Self::Item> {
         // Are we done?
@@ -193,16 +197,18 @@ impl CircleCircumferenceIterStep {
 }
 
 #[derive(Debug, Clone)]
-pub struct CircleCircumferenceIter<C: Coord> {
+pub struct CircleCircumferenceIter<C: Coord, S: Size> {
     center: C,
     discovered: HashSet<C>,
     d: i32,
     x: i32,
     y: i32,
     step: CircleCircumferenceIterStep,
+
+    _phantom: PhantomData<S>,
 }
 
-impl<C: Coord> CircleCircumferenceIter<C> {
+impl<C: Coord, S: Size> CircleCircumferenceIter<C, S> {
     pub fn new(center: C, radius: u32) -> Self {
         Self {
             center,
@@ -211,6 +217,8 @@ impl<C: Coord> CircleCircumferenceIter<C> {
             x: 0,
             y: radius as i32,
             step: CircleCircumferenceIterStep::Line1,
+
+            _phantom: PhantomData,
         }
     }
 
@@ -267,7 +275,7 @@ impl<C: Coord> CircleCircumferenceIter<C> {
     }
 }
 
-impl<C: Coord> Iterator for CircleCircumferenceIter<C> {
+impl<C: Coord, S: Size> Iterator for CircleCircumferenceIter<C, S> {
     type Item = C;
     fn next(&mut self) -> Option<Self::Item> {
         // Are we done?
