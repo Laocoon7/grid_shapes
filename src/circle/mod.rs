@@ -11,6 +11,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+/// Represents a Circle on a grid
 pub struct Circle<C: Coord, S: Size> {
     pub center: C,
     pub radius: u32,
@@ -53,10 +54,12 @@ impl<C: Coord, S: Size> Circle<C, S> {
         C::new(self.center.x(), self.center.y() - self.radius as i32)
     }
 
+    /// Get the number of cells inside the circle
     pub fn get_count(self) -> u32 {
         self.into_iter().count() as u32
     }
 
+    /// Determine if a position is inside the circle
     pub fn contains(self, position: C) -> bool {
         self.into_iter().find(|&c| c == position).is_some()
     }
@@ -64,10 +67,12 @@ impl<C: Coord, S: Size> Circle<C, S> {
 
 // Iterators
 impl<C: Coord, S: Size> Circle<C, S> {
+    /// Provides an iterator over the outer most ring of cells
     pub fn circumference_iter(self) -> CircleCircumferenceIter<C, S> {
         CircleCircumferenceIter::new(self.center, self.radius)
     }
 
+    /// Calls `f` for each Coord in the circumference
     pub fn for_each_circumference<F: FnMut(C)>(self, mut f: F) {
         for coord in self.circumference_iter() {
             f(coord);

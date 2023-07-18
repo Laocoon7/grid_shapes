@@ -9,6 +9,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+/// Represents a Rectangle on a grid
 pub struct Rectangle<C: Coord, S: Size> {
     pub position: C,
     pub size: S,
@@ -16,14 +17,17 @@ pub struct Rectangle<C: Coord, S: Size> {
 
 // Constructors
 impl<C: Coord, S: Size> Rectangle<C, S> {
+    /// Creates a new Rectangle with a known size
     pub fn from_size(position: C, size: S) -> Self {
         Self { position, size }
     }
 
+    /// Creates a new Rectangle with known corners
     pub fn from_corners(position0: C, position1: C) -> Self {
         Self::new(position0.x(), position0.y(), position1.x(), position1.y())
     }
 
+    /// Creates a new Rectangle
     pub fn new(x0: i32, y0: i32, x1: i32, y1: i32) -> Self {
         let min = C::new(x0.min(x1), y0.min(y1));
         let max = C::new(x0.max(x1), y0.max(y1));
@@ -37,50 +41,62 @@ impl<C: Coord, S: Size> Rectangle<C, S> {
 
 // Implementation
 impl<C: Coord, S: Size> Rectangle<C, S> {
+    /// Get the size of the rectangle
     pub fn size(self) -> S {
         self.size
     }
 
+    /// Get the width of the rectangle
     pub fn width(self) -> u32 {
         self.size.width()
     }
 
+    /// Get the height of the rectangle
     pub fn height(self) -> u32 {
         self.size.height()
     }
 
+    /// Get the minimum Coord of the rectangle
     pub fn min(self) -> C {
         self.position
     }
 
+    /// Get the maximum coord of the rectangle
     pub fn max(self) -> C {
         C::new(self.right(), self.top())
     }
 
+    /// Get the left point of the rectangle
     pub fn left(self) -> i32 {
         self.position.x()
     }
 
+    /// Get the right point of the rectangle
     pub fn right(self) -> i32 {
         self.position.x() + self.width() as i32 - 1
     }
 
+    /// Get the top point of the rectangle
     pub fn top(self) -> i32 {
         self.position.y() + self.height() as i32 - 1
     }
 
+    /// Get the bottom point of the rectangle
     pub fn bottom(self) -> i32 {
         self.position.y()
     }
 
+    /// Get the center of the rectangle
     pub fn center(self) -> C {
         C::new((self.right() + self.left()) / 2, (self.top() + self.bottom()) / 2)
     }
 
+    /// Determine if the rectangle is a square
     pub fn is_square(self) -> bool {
         self.width() == self.height()
     }
 
+    /// Determine if one rectangle intersects another
     pub fn intersects(self, other: Self) -> bool {
         self.left() <= other.right()
             && self.right() >= other.left()
@@ -91,10 +107,12 @@ impl<C: Coord, S: Size> Rectangle<C, S> {
 
 // Iterators
 impl<C: Coord, S: Size> Rectangle<C, S> {
+    /// Provides an iterator over the outer most border of the rectangle
     pub fn border_iter(self) -> RectangleBorderIter<C> {
         RectangleBorderIter::new(self.position, self.size)
     }
 
+    /// Calls `f` for each Coord in the border
     pub fn for_each_border<F: FnMut(C)>(self, mut f: F) {
         for coord in self.border_iter() {
             f(coord);

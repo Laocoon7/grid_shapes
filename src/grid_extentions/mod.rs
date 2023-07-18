@@ -4,29 +4,49 @@ use grid_2d::Grid;
 use crate::{prelude::*, Shape};
 
 pub trait ShapeGridExtensions<T> {
+    /// Copy a shape off of the grid
     fn get_from_shape(&self, shape: impl Shape<Coord, Size>, unused_value: T) -> Self;
+    /// Copy a shape onto the grid
     fn set_from_shape(&mut self, shape: impl Shape<Coord, Size>, value: T);
+    /// Copy a shape off of the grid at an offset
     fn get_from_shape_offset(&self, shape: impl Shape<Coord, Size>, offset: Coord, unused_value: T) -> Self;
+    /// Copy a shape onto the grid at an offset
     fn set_from_shape_offset(&mut self, shape: impl Shape<Coord, Size>, offset: Coord, value: T);
     
+    /// Copy the border for a rectangle off of the grid
     fn get_from_rectangle_border(&self, rectangle: Rectangle, unused_value: T) -> Self;
+    /// Copy the border for a rectangle onto the grid
     fn set_from_rectangle_border(&mut self, rectangle: Rectangle, value: T);
+    /// Copy the border for a rectangle off of the grid at an offset
     fn get_from_rectangle_border_offset(&self, rectangle: Rectangle, offset: Coord, unused_value: T) -> Self;
+    /// Copy the border for a rectangle onto the grid at an offset
     fn set_from_rectangle_border_offset(&mut self, rectangle: Rectangle, offset: Coord, value: T);
 
+    /// Copy the circumference for a circle off of the grid
     fn get_from_circle_circumference(&self, circle: Circle, unused_value: T) -> Self;
+    /// Copy the circumference for a circle onto the grid
     fn set_from_circle_circumference(&mut self, circle: Circle, value: T);
+    /// Copy the circumference for a circle off of the grid at an offset
     fn get_from_circle_circumference_offset(&self, circle: Circle, offset: Coord, unused_value: T) -> Self;
+    /// Copy the circumference for a circle onto the grid at an offset
     fn set_from_circle_circumference_offset(&mut self, circle: Circle, offset: Coord, value: T);
 
+    /// Copy the line tunneling horizontal then vertical off of the grid
     fn get_from_line_tunnel_horizontal_vertical(&self, line: Line, unused_value: T) -> Self;
+    /// Copy the line tunneling horizontal then vertical onto the grid
     fn set_from_line_tunnel_horizontal_vertical(&mut self, line: Line, value: T);
+    /// Copy the line tunneling horizontal then vertical off of the grid at an offset
     fn get_from_line_tunnel_horizontal_vertical_offset(&self, line: Line, offset: Coord, unused_value: T) -> Self;
+    /// Copy the line tunneling horizontal then vertical onto the grid at an offset
     fn set_from_line_tunnel_horizontal_vertical_offset(&mut self, line: Line, offset: Coord, value: T);
 
+    /// Copy the line tunneling vertical then horizontal off of the grid
     fn get_from_line_tunnel_vertical_horizontal(&self, line: Line, unused_value: T) -> Self;
+    /// Copy the line tunneling vertical then horizontal onto the grid
     fn set_from_line_tunnel_vertical_horizontal(&mut self, line: Line, value: T);
+    /// Copy the line tunneling vertical then horizontal off of the grid at an offset
     fn get_from_line_tunnel_vertical_horizontal_offset(&self, line: Line, offset: Coord, unused_value: T) -> Self;
+    /// Copy the line tunneling vertical then horizontal onto the grid at an offset
     fn set_from_line_tunnel_vertical_horizontal_offset(&mut self, line: Line, offset: Coord, value: T);
 }
 

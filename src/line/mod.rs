@@ -13,6 +13,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+/// Represents a Line on a grid
 pub struct Line<C: Coord, S: Size> {
     pub start: C,
     pub end: C,
@@ -22,6 +23,7 @@ pub struct Line<C: Coord, S: Size> {
 
 // Constructors
 impl<C: Coord, S: Size> Line<C, S> {
+    /// Creates a new Line
     pub fn new(start: C, end: C) -> Self {
         Self { start, end, _phantom: PhantomData }
     }
@@ -29,6 +31,7 @@ impl<C: Coord, S: Size> Line<C, S> {
 
 // Implementation
 impl<C: Coord, S: Size> Line<C, S> {
+    /// Get the total length of the line
     pub fn len(self) -> u32 {
         (self.end.x() - self.start.x())
             .abs()
@@ -36,10 +39,12 @@ impl<C: Coord, S: Size> Line<C, S> {
             + 1
     }
 
+    /// Get the starting point of the line
     pub fn start(self) -> C {
         self.start
     }
 
+    /// Get the ending point of the line
     pub fn end(self) -> C {
         self.end
     }
@@ -47,20 +52,24 @@ impl<C: Coord, S: Size> Line<C, S> {
 
 // Iterator
 impl<C: Coord, S: Size> Line<C, S> {
+    /// Provides an iterator over a line horizontal and then vertical reaching the ending
     pub fn tunnel_horizontal_vertical_iter(self) -> TunnelHorizontalVerticalLineIter<C> {
         TunnelHorizontalVerticalLineIter::new(self.start, self.end)
     }
 
+    /// Provides an iterator over a line vertical and then horizontal reaching the ending
     pub fn tunnel_vertical_horizontal_iter(self) -> TunnelVerticalHorizontalLineIter<C> {
         TunnelVerticalHorizontalLineIter::new(self.start, self.end)
     }
 
+    /// Calls `f` for each Coord in the tunnel
     pub fn for_each_tunnel_horizontal_vertical<F: FnMut(C)>(self, mut f: F) {
         for coord in self.tunnel_horizontal_vertical_iter() {
             f(coord);
         }
     }
 
+    /// Calls `f` for each Coord in the tunnel
     pub fn for_each_tunnel_vertical_horizontal<F: FnMut(C)>(self, mut f: F) {
         for coord in self.tunnel_vertical_horizontal_iter() {
             f(coord);
