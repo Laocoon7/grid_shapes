@@ -14,7 +14,7 @@ readme = "./README.md"
 
 [features]
 default = [
-    "extentions",
+    # "extentions",
 ]
 
 extentions = []
