@@ -1,20 +1,20 @@
-use crate::Coord;
+use coord_2d::Coord;
 
 use super::octant::Octant;
 
 #[derive(Debug, Clone)]
-pub struct BresenhamLineIter<C: Coord> {
+pub struct LineBresenhamIter {
     abs_x: i32,
     abs_y: i32,
     end_x: i32,
     delta_step: i32,
     delta_x: i32,
     delta_y: i32,
-    octant: Octant<C>,
+    octant: Octant,
 }
 
-impl<C: Coord> BresenhamLineIter<C> {
-    pub fn new(start: C, end: C) -> Self {
+impl LineBresenhamIter {
+    pub fn new(start: Coord, end: Coord) -> Self {
         let octant = Octant::new(start, end);
 
         let start_offset = octant.to_offset(start);
@@ -34,7 +34,7 @@ impl<C: Coord> BresenhamLineIter<C> {
         }
     }
 
-    pub fn advance(&mut self) -> C {
+    pub fn advance(&mut self) -> Coord {
         let current_point = (self.abs_x, self.abs_y);
         if self.delta_step >= 0 {
             self.abs_y += 1;
@@ -49,8 +49,8 @@ impl<C: Coord> BresenhamLineIter<C> {
     }
 }
 
-impl<C: Coord> Iterator for BresenhamLineIter<C> {
-    type Item = C;
+impl Iterator for LineBresenhamIter {
+    type Item = Coord;
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.abs_x > self.end_x {

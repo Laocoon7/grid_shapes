@@ -1,36 +1,22 @@
-mod units;
-pub use self::units::Coord;
-pub use self::units::Shape;
-pub use self::units::Size;
-
-pub mod circle;
-pub mod line;
-pub mod rectangle;
-
-pub mod iters;
-
-#[cfg(feature = "grid_2d")]
+#[cfg(feature = "extentions")]
 pub mod grid_extentions;
 
+pub mod shapes;
+
 pub mod prelude {
+    // Trait
+    pub use crate::shapes::Shape;
+    
     // Circles
-    #[cfg(feature = "coord_2d")]
-    pub type Circle = crate::circle::Circle<coord_2d::Coord, coord_2d::Size>;
-    #[cfg(not(feature = "coord_2d"))]
-    pub use crate::circle::Circle;
+    pub use crate::shapes::Circle;
 
     // Lines
-    #[cfg(feature = "coord_2d")]
-    pub type Line = crate::line::Line<coord_2d::Coord, coord_2d::Size>;
-    #[cfg(not(feature = "coord_2d"))]
-    pub use crate::line::Line;
+    pub use crate::shapes::Line;
 
     // Rectangles
-    #[cfg(feature = "coord_2d")]
-    pub type Rectangle = crate::rectangle::Rectangle<coord_2d::Coord, coord_2d::Size>;
-    #[cfg(not(feature = "coord_2d"))]
-    pub use crate::rectangle::Rectangle;
+    pub use crate::shapes::Rectangle;
 
-    #[cfg(feature = "grid_2d")]
+    // Extensions
+    #[cfg(feature = "extentions")]
     pub use crate::grid_extentions::*;
 }

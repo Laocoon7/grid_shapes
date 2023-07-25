@@ -3,14 +3,16 @@ use std::{
     hash::Hash,
 };
 
-use crate::{Coord, rectangle::Rectangle, Size};
+use coord_2d::Coord;
 
-pub trait Shape<C: Coord, S: Size>:
+use super::Rectangle;
+
+pub trait Shape:
     Debug + Display + Clone + Copy + PartialEq + Eq + Hash + Default + IntoIterator
 {
     /// Calls `f` for each Coord in the shape
-    fn for_each<F: FnMut(C)>(self, f: F);
+    fn for_each<F: FnMut(Coord)>(self, f: F);
     
     /// Returns an axis aligned bounding box containing the shape
-    fn aabb(self) -> Rectangle<C, S>;
+    fn aabb(self) -> Rectangle;
 }

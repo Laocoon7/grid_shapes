@@ -1,26 +1,24 @@
-use std::marker::PhantomData;
-
-use crate::Coord;
+use coord_2d::Coord;
 
 /// An octant
 #[derive(Debug, Clone)]
-pub struct Octant<C: Coord>(pub u8, PhantomData<C>);
+pub struct Octant(pub u8);
 
-impl<C: Coord> Octant<C> {
+impl Octant {
     /// adapted from <http://codereview.stackexchange.com/a/95551>
     /// converts a `Coord` into a coordinate relative `Octant(0)` offset
 
     #[inline]
-    pub fn to_offset(&self, position: C) -> (i32, i32) {
+    pub fn to_offset(&self, position: Coord) -> (i32, i32) {
         match self.0 {
-            0 => (position.x(), position.y()),
-            1 => (position.y(), position.x()),
-            2 => (position.y(), -position.x()),
-            3 => (-position.x(), position.y()),
-            4 => (-position.x(), -position.y()),
-            5 => (-position.y(), -position.x()),
-            6 => (-position.y(), position.x()),
-            7 => (position.x(), -position.y()),
+            0 => (position.x, position.y),
+            1 => (position.y, position.x),
+            2 => (position.y, -position.x),
+            3 => (-position.x, position.y),
+            4 => (-position.x, -position.y),
+            5 => (-position.y, -position.x),
+            6 => (-position.y, position.x),
+            7 => (position.x, -position.y),
             _ => unreachable!(),
         }
     }
@@ -28,7 +26,7 @@ impl<C: Coord> Octant<C> {
     /// converts from a `Octant(0)` relative coordinate into a `Coord`
     #[inline]
     #[allow(clippy::wrong_self_convention)]
-    pub fn from_offset(&self, offset: (i32, i32)) -> C {
+    pub fn from_offset(&self, offset: (i32, i32)) -> Coord {
         let p = match self.0 {
             0 => (offset.0, offset.1),
             1 => (offset.1, offset.0),
@@ -40,18 +38,18 @@ impl<C: Coord> Octant<C> {
             7 => (offset.0, -offset.1),
             _ => unreachable!(),
         };
-        C::new(p.0, p.1)
+        Coord::new(p.0, p.1)
     }
 
     /// Creates a new `Octant` from two points
     #[inline(always)]
-    pub fn new(position: C, other: C) -> Self {
+    pub fn new(position: Coord, other: Coord) -> Self {
         // adapted from <http://codereview.stackexchange.com/a/95551>
         let start = position;
         let end = other;
 
-        let mut dx = end.x() - start.x();
-        let mut dy = end.y() - start.y();
+        let mut dx = end.x - start.x;
+        let mut dy = end.y - start.y;
         let mut octant = 0;
         if dy < 0 {
             dx = -dx;
@@ -68,6 +66,6 @@ impl<C: Coord> Octant<C> {
             octant += 1;
         }
 
-        Self(octant, PhantomData)
+        Self(octant)
     }
 }

@@ -1,17 +1,17 @@
-use coord_2d::{Coord, Size};
+use coord_2d::Coord;
 use grid_2d::Grid;
 
-use crate::{prelude::*, Shape};
+use crate::prelude::*;
 
 pub trait ShapeGridExtensions<T> {
     /// Copy a shape off of the grid
-    fn get_from_shape(&self, shape: impl Shape<Coord, Size>, unused_value: T) -> Self;
+    fn get_from_shape(&self, shape: impl Shape, unused_value: T) -> Self;
     /// Copy a shape onto the grid
-    fn set_from_shape(&mut self, shape: impl Shape<Coord, Size>, value: T);
+    fn set_from_shape(&mut self, shape: impl Shape, value: T);
     /// Copy a shape off of the grid at an offset
-    fn get_from_shape_offset(&self, shape: impl Shape<Coord, Size>, offset: Coord, unused_value: T) -> Self;
+    fn get_from_shape_offset(&self, shape: impl Shape, offset: Coord, unused_value: T) -> Self;
     /// Copy a shape onto the grid at an offset
-    fn set_from_shape_offset(&mut self, shape: impl Shape<Coord, Size>, offset: Coord, value: T);
+    fn set_from_shape_offset(&mut self, shape: impl Shape, offset: Coord, value: T);
     
     /// Copy the border for a rectangle off of the grid
     fn get_from_rectangle_border(&self, rectangle: Rectangle, unused_value: T) -> Self;
@@ -51,7 +51,7 @@ pub trait ShapeGridExtensions<T> {
 }
 
 impl<T: Copy> ShapeGridExtensions<T> for Grid<T> {
-    fn get_from_shape(&self, shape: impl Shape<Coord, Size>, unused_value: T) -> Self {
+    fn get_from_shape(&self, shape: impl Shape, unused_value: T) -> Self {
         let rectangle = shape.aabb();
         let mut grid = Grid::new_copy(rectangle.size, unused_value);
 
@@ -65,7 +65,7 @@ impl<T: Copy> ShapeGridExtensions<T> for Grid<T> {
         grid
     }
 
-    fn set_from_shape(&mut self, shape: impl Shape<Coord, Size>, value: T) {
+    fn set_from_shape(&mut self, shape: impl Shape, value: T) {
         shape.for_each(|coord| {
             if let Some(grid_value) = self.get_mut(coord) {
                 *grid_value = value;
@@ -73,7 +73,7 @@ impl<T: Copy> ShapeGridExtensions<T> for Grid<T> {
         });
     }
 
-    fn get_from_shape_offset(&self, shape: impl Shape<Coord, Size>, offset: Coord, unused_value: T) -> Self {
+    fn get_from_shape_offset(&self, shape: impl Shape, offset: Coord, unused_value: T) -> Self {
         let rectangle = shape.aabb();
         let mut grid = Grid::new_copy(rectangle.size, unused_value);
 
@@ -88,7 +88,7 @@ impl<T: Copy> ShapeGridExtensions<T> for Grid<T> {
         grid
     }
     
-    fn set_from_shape_offset(&mut self, shape: impl Shape<Coord, Size>, offset: Coord, value: T) {
+    fn set_from_shape_offset(&mut self, shape: impl Shape, offset: Coord, value: T) {
         shape.for_each(|coord| {
             let position = Coord::new(coord.x + offset.x, coord.y + offset.y);
             if let Some(grid_value) = self.get_mut(position) {

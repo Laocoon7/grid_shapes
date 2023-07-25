@@ -1,76 +1,69 @@
-use std::{fmt::{Debug, Display}, marker::PhantomData};
+use std::fmt::{Debug, Display};
 
-use crate::{
-    iters::line::{
-        BresenhamLineIter, TunnelHorizontalVerticalLineIter, TunnelVerticalHorizontalLineIter,
-    },
-    units::Shape,
-    Coord, rectangle::Rectangle, Size,
-};
-
+use coord_2d::Coord;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
+
+use super::{Shape, iters::{LineTunnelHorizontalVerticalIter, LineTunnelVerticalHorizontalIter, LineBresenhamIter}, Rectangle};
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 /// Represents a Line on a grid
-pub struct Line<C: Coord, S: Size> {
-    pub start: C,
-    pub end: C,
-
-    _phantom: PhantomData<S>,
+pub struct Line {
+    pub start: Coord,
+    pub end: Coord,
 }
 
 // Constructors
-impl<C: Coord, S: Size> Line<C, S> {
+impl Line {
     /// Creates a new Line
-    pub fn new(start: C, end: C) -> Self {
-        Self { start, end, _phantom: PhantomData }
+    pub fn new(start: Coord, end: Coord) -> Self {
+        Self { start, end }
     }
 }
 
 // Implementation
-impl<C: Coord, S: Size> Line<C, S> {
+impl Line {
     /// Get the total length of the line
     pub fn len(self) -> u32 {
-        (self.end.x() - self.start.x())
+        (self.end.x - self.start.x)
             .abs()
-            .max((self.end.y() - self.start.y()).abs()) as u32
+            .max((self.end.y - self.start.y).abs()) as u32
             + 1
     }
 
     /// Get the starting point of the line
-    pub fn start(self) -> C {
+    pub fn start(self) -> Coord {
         self.start
     }
 
     /// Get the ending point of the line
-    pub fn end(self) -> C {
+    pub fn end(self) -> Coord {
         self.end
     }
 }
 
 // Iterator
-impl<C: Coord, S: Size> Line<C, S> {
+impl Line {
     /// Provides an iterator over a line horizontal and then vertical reaching the ending
-    pub fn tunnel_horizontal_vertical_iter(self) -> TunnelHorizontalVerticalLineIter<C> {
-        TunnelHorizontalVerticalLineIter::new(self.start, self.end)
+    pub fn tunnel_horizontal_vertical_iter(self) -> LineTunnelHorizontalVerticalIter {
+        LineTunnelHorizontalVerticalIter::new(self.start, self.end)
     }
 
     /// Provides an iterator over a line vertical and then horizontal reaching the ending
-    pub fn tunnel_vertical_horizontal_iter(self) -> TunnelVerticalHorizontalLineIter<C> {
-        TunnelVerticalHorizontalLineIter::new(self.start, self.end)
+    pub fn tunnel_vertical_horizontal_iter(self) -> LineTunnelVerticalHorizontalIter {
+        LineTunnelVerticalHorizontalIter::new(self.start, self.end)
     }
 
     /// Calls `f` for each Coord in the tunnel
-    pub fn for_each_tunnel_horizontal_vertical<F: FnMut(C)>(self, mut f: F) {
+    pub fn for_each_tunnel_horizontal_vertical<F: FnMut(Coord)>(self, mut f: F) {
         for coord in self.tunnel_horizontal_vertical_iter() {
             f(coord);
         }
     }
 
     /// Calls `f` for each Coord in the tunnel
-    pub fn for_each_tunnel_vertical_horizontal<F: FnMut(C)>(self, mut f: F) {
+    pub fn for_each_tunnel_vertical_horizontal<F: FnMut(Coord)>(self, mut f: F) {
         for coord in self.tunnel_vertical_horizontal_iter() {
             f(coord);
         }
@@ -78,67 +71,63 @@ impl<C: Coord, S: Size> Line<C, S> {
 }
 
 // Shape
-impl<C: Coord, S: Size> Shape<C, S> for Line<C, S> {
-    fn for_each<F: FnMut(C)>(self, mut f: F) {
+impl Shape for Line {
+    fn for_each<F: FnMut(Coord)>(self, mut f: F) {
         for coord in self {
             f(coord);
         }
     }
 
-    fn aabb(self) -> Rectangle<C, S> {
+    fn aabb(self) -> Rectangle {
         Rectangle::from_corners(self.start, self.end)
     }
 }
 
-impl<C: Coord, S: Size> IntoIterator for Line<C, S> {
-    type IntoIter = BresenhamLineIter<C>;
-    type Item = C;
+impl IntoIterator for Line {
+    type IntoIter = LineBresenhamIter;
+    type Item = Coord;
     fn into_iter(self) -> Self::IntoIter {
-        BresenhamLineIter::new(self.start, self.end)
+        LineBresenhamIter::new(self.start, self.end)
     }
 }
 
-impl<C: Coord, S: Size> Default for Line<C, S> {
+impl Default for Line {
     fn default() -> Self {
         Self {
-            start: C::new(0, 0),
-            end: C::new(1, 0),
-            _phantom: PhantomData,
+            start: Coord::new(0, 0),
+            end: Coord::new(1, 0),
         }
     }
 }
 
-impl<C: Coord, S: Size> Debug for Line<C, S> {
+impl Debug for Line {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
             "Line {{ start: ({}, {}), end: ({}, {}) }}",
-            self.start.x(),
-            self.start.y(),
-            self.end.x(),
-            self.end.y()
-        )
+            self.start.x,
+            self.start.y,
+            self.end.x,
+            self.end.y,        )
     }
 }
 
-impl<C: Coord, S: Size> Display for Line<C, S> {
+impl Display for Line {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
             "Line {{\n\tstart: ({}, {}),\n\tend: ({}, {}),\n}}",
-            self.start.x(),
-            self.start.y(),
-            self.end.x(),
-            self.end.y()
-        )
+            self.start.x,
+            self.start.y,
+            self.end.x,
+            self.end.y,        )
     }
 }
 
-#[cfg(feature = "coord_2d")]
 #[cfg(test)]
 mod test {
     use super::*;
-    use coord_2d::{Coord, Size};
+    use coord_2d::Coord;
 
     fn start() -> Coord {
         Coord::new(0, 0)
@@ -152,7 +141,7 @@ mod test {
         3
     }
 
-    fn line_new() -> Line<Coord, Size> {
+    fn line_new() -> Line {
         Line::new(start(), end())
     }
 

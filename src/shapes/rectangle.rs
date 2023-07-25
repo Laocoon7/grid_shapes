@@ -1,48 +1,49 @@
 use std::fmt::{Debug, Display};
 
-use crate::{
-    iters::rectangle::{RectangleBorderIter, RectangleIter},
-    units::{Coord, Shape, Size},
-};
+use crate::shapes::iters::{RectangleBorderIter, RectangleIter};
+use coord_2d::{Coord, Size};
+
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
+
+use super::Shape;
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 /// Represents a Rectangle on a grid
-pub struct Rectangle<C: Coord, S: Size> {
-    pub position: C,
-    pub size: S,
+pub struct Rectangle {
+    pub position: Coord,
+    pub size: Size,
 }
 
 // Constructors
-impl<C: Coord, S: Size> Rectangle<C, S> {
+impl Rectangle {
     /// Creates a new Rectangle with a known size
-    pub fn from_size(position: C, size: S) -> Self {
+    pub fn from_size(position: Coord, size: Size) -> Self {
         Self { position, size }
     }
 
     /// Creates a new Rectangle with known corners
-    pub fn from_corners(position0: C, position1: C) -> Self {
-        Self::new(position0.x(), position0.y(), position1.x(), position1.y())
+    pub fn from_corners(position0: Coord, position1: Coord) -> Self {
+        Self::new(position0.x, position0.y, position1.x, position1.y)
     }
 
     /// Creates a new Rectangle
     pub fn new(x0: i32, y0: i32, x1: i32, y1: i32) -> Self {
-        let min = C::new(x0.min(x1), y0.min(y1));
-        let max = C::new(x0.max(x1), y0.max(y1));
-        let size = S::new(
-            (max.x() - min.x()).abs() as u32 + 1,
-            (max.y() - min.y()).abs() as u32 + 1,
+        let min = Coord::new(x0.min(x1), y0.min(y1));
+        let max = Coord::new(x0.max(x1), y0.max(y1));
+        let size = Size::new(
+            (max.x - min.x).abs() as u32 + 1,
+            (max.y - min.y).abs() as u32 + 1,
         );
         Self::from_size(min, size)
     }
 }
 
 // Implementation
-impl<C: Coord, S: Size> Rectangle<C, S> {
+impl Rectangle {
     /// Get the size of the rectangle
-    pub fn size(self) -> S {
+    pub fn size(self) -> Size {
         self.size
     }
 
@@ -57,38 +58,38 @@ impl<C: Coord, S: Size> Rectangle<C, S> {
     }
 
     /// Get the minimum Coord of the rectangle
-    pub fn min(self) -> C {
+    pub fn min(self) -> Coord {
         self.position
     }
 
     /// Get the maximum coord of the rectangle
-    pub fn max(self) -> C {
-        C::new(self.right(), self.top())
+    pub fn max(self) -> Coord {
+        Coord::new(self.right(), self.top())
     }
 
     /// Get the left point of the rectangle
     pub fn left(self) -> i32 {
-        self.position.x()
+        self.position.x
     }
 
     /// Get the right point of the rectangle
     pub fn right(self) -> i32 {
-        self.position.x() + self.width() as i32 - 1
+        self.position.x + self.width() as i32 - 1
     }
 
     /// Get the top point of the rectangle
     pub fn top(self) -> i32 {
-        self.position.y() + self.height() as i32 - 1
+        self.position.y + self.height() as i32 - 1
     }
 
     /// Get the bottom point of the rectangle
     pub fn bottom(self) -> i32 {
-        self.position.y()
+        self.position.y
     }
 
     /// Get the center of the rectangle
-    pub fn center(self) -> C {
-        C::new((self.right() + self.left()) / 2, (self.top() + self.bottom()) / 2)
+    pub fn center(self) -> Coord {
+        Coord::new((self.right() + self.left()) / 2, (self.top() + self.bottom()) / 2)
     }
 
     /// Determine if the rectangle is a square
@@ -106,14 +107,14 @@ impl<C: Coord, S: Size> Rectangle<C, S> {
 }
 
 // Iterators
-impl<C: Coord, S: Size> Rectangle<C, S> {
+impl Rectangle {
     /// Provides an iterator over the outer most border of the rectangle
-    pub fn border_iter(self) -> RectangleBorderIter<C> {
+    pub fn border_iter(self) -> RectangleBorderIter {
         RectangleBorderIter::new(self.position, self.size)
     }
 
     /// Calls `f` for each Coord in the border
-    pub fn for_each_border<F: FnMut(C)>(self, mut f: F) {
+    pub fn for_each_border<F: FnMut(Coord)>(self, mut f: F) {
         for coord in self.border_iter() {
             f(coord);
         }
@@ -121,27 +122,27 @@ impl<C: Coord, S: Size> Rectangle<C, S> {
 }
 
 // Shape
-impl<C: Coord, S: Size> Shape<C, S> for Rectangle<C, S> {
-    fn for_each<F: FnMut(C)>(self, mut f: F) {
+impl Shape for Rectangle {
+    fn for_each<F: FnMut(Coord)>(self, mut f: F) {
         for coord in self {
             f(coord);
         }
     }
 
-    fn aabb(self) -> Rectangle<C, S> {
+    fn aabb(self) -> Rectangle {
         self
     }
 }
 
-impl<C: Coord, S: Size> IntoIterator for Rectangle<C, S> {
-    type IntoIter = RectangleIter<C>;
-    type Item = C;
+impl IntoIterator for Rectangle {
+    type IntoIter = RectangleIter;
+    type Item = Coord;
     fn into_iter(self) -> Self::IntoIter {
         RectangleIter::new(self.position, self.size)
     }
 }
 
-impl<C: Coord, S: Size> Default for Rectangle<C, S> {
+impl Default for Rectangle {
     fn default() -> Self {
         Self {
             position: Coord::new(0, 0),
@@ -150,33 +151,32 @@ impl<C: Coord, S: Size> Default for Rectangle<C, S> {
     }
 }
 
-impl<C: Coord, S: Size> Debug for Rectangle<C, S> {
+impl Debug for Rectangle {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
             "Rectangle {{ position: ({}, {}), size: ({}, {}) }}",
-            self.position.x(),
-            self.position.y(),
+            self.position.x,
+            self.position.y,
             self.size.width(),
             self.size.height()
         )
     }
 }
 
-impl<C: Coord, S: Size> Display for Rectangle<C, S> {
+impl Display for Rectangle {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
             "Rectangle {{\n\tposition: ({}, {}),\n\tsize: ({}, {})\n}}",
-            self.position.x(),
-            self.position.y(),
+            self.position.x,
+            self.position.y,
             self.size.width(),
             self.size.height()
         )
     }
 }
 
-#[cfg(feature = "coord_2d")]
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -194,16 +194,16 @@ mod tests {
         Coord::new(2, 9)
     }
 
-    fn rect_from_size() -> Rectangle<Coord, Size> {
+    fn rect_from_size() -> Rectangle {
         Rectangle::from_size(min(), size())
     }
 
-    fn rect_from_corners() -> Rectangle<Coord, Size> {
-        Rectangle::<Coord, Size>::from_corners(min(), max())
+    fn rect_from_corners() -> Rectangle {
+        Rectangle::from_corners(min(), max())
     }
 
-    fn rect_new() -> Rectangle<Coord, Size> {
-        Rectangle::<Coord, Size>::new(min().x, min().y, max().x, max().y)
+    fn rect_new() -> Rectangle {
+        Rectangle::new(min().x, min().y, max().x, max().y)
     }
 
     #[test]
@@ -281,27 +281,27 @@ mod tests {
 
     #[test]
     fn test_is_square() {
-        let rect = Rectangle::<Coord, Size>::new(0, 0, 10, 10);
+        let rect = Rectangle::new(0, 0, 10, 10);
         assert!(rect.is_square());
 
-        let rect = Rectangle::<Coord, Size>::new(0, 0, 10, 20);
+        let rect = Rectangle::new(0, 0, 10, 20);
         assert!(!rect.is_square());
     }
 
     #[test]
     fn test_intersects() {
-        let rect1 = Rectangle::<Coord, Size>::new(0, 0, 10, 10);
-        let rect2 = Rectangle::<Coord, Size>::new(5, 5, 15, 15);
+        let rect1 = Rectangle::new(0, 0, 10, 10);
+        let rect2 = Rectangle::new(5, 5, 15, 15);
         assert!(rect1.intersects(rect2));
 
-        let rect1 = Rectangle::<Coord, Size>::new(0, 0, 10, 10);
-        let rect2 = Rectangle::<Coord, Size>::new(11, 11, 20, 20);
+        let rect1 = Rectangle::new(0, 0, 10, 10);
+        let rect2 = Rectangle::new(11, 11, 20, 20);
         assert!(!rect1.intersects(rect2));
     }
 
     #[test]
     fn test_for_each() {
-        let rect = Rectangle::<Coord, Size>::new(0, 0, 1, 1);
+        let rect = Rectangle::new(0, 0, 1, 1);
         let mut points = Vec::new();
         rect.for_each(|point| points.push(point));
         assert_eq!(
@@ -317,7 +317,7 @@ mod tests {
 
     #[test]
     fn test_into_iter() {
-        let rect = Rectangle::<Coord, Size>::new(0, 0, 1, 1);
+        let rect = Rectangle::new(0, 0, 1, 1);
         let points: Vec<Coord> = rect.into_iter().collect();
         assert_eq!(
             points,

@@ -1,6 +1,6 @@
 [package]
 name = "grid_shapes"
-version = "0.1.2"
+version = "0.1.3"
 authors = ["Wes Feldsine <laocoon7@gmail.com>"]
 edition = "2021"
 license = "MIT OR Apache-2.0"
@@ -14,17 +14,10 @@ readme = "./README.md"
 
 [features]
 default = [
-    "grid_2d",
+    "extentions",
 ]
 
-coord_2d = [
-    "dep:coord_2d",
-]
-
-grid_2d = [
-    "coord_2d",
-    "dep:grid_2d",
-]
+extentions = []
 
 serde = [
     "dep:serde",
@@ -34,8 +27,8 @@ serde = [
 
 
 [dependencies]
-coord_2d = { version = "0.3", optional = true } # A general purpose 2d coordinate
-grid_2d = { version = "0.15", optional = true } # A general purpose 2d grid
+coord_2d = { version = "0.3" } # A general purpose 2d coordinate
+grid_2d = { version = "0.15" } # A general purpose 2d grid
 
 serde = { version = "1", optional = true } # A generic serialization/deserialization framework
 
