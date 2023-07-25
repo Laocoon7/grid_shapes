@@ -4,7 +4,12 @@ use coord_2d::Coord;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
-use super::{Shape, iters::{LineTunnelHorizontalVerticalIter, LineTunnelVerticalHorizontalIter, LineBresenhamIter}, Rectangle};
+use super::{
+    iters::{
+        LineBresenhamIter, LineTunnelHorizontalVerticalIter, LineTunnelVerticalHorizontalIter,
+    },
+    Rectangle, Shape,
+};
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -105,10 +110,8 @@ impl Debug for Line {
         write!(
             f,
             "Line {{ start: ({}, {}), end: ({}, {}) }}",
-            self.start.x,
-            self.start.y,
-            self.end.x,
-            self.end.y,        )
+            self.start.x, self.start.y, self.end.x, self.end.y,
+        )
     }
 }
 
@@ -117,10 +120,8 @@ impl Display for Line {
         write!(
             f,
             "Line {{\n\tstart: ({}, {}),\n\tend: ({}, {}),\n}}",
-            self.start.x,
-            self.start.y,
-            self.end.x,
-            self.end.y,        )
+            self.start.x, self.start.y, self.end.x, self.end.y,
+        )
     }
 }
 

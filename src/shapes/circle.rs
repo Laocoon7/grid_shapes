@@ -4,7 +4,10 @@ use coord_2d::Coord;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
-use super::{Shape, Rectangle, iters::{CircleIter, CircleCircumferenceIter}};
+use super::{
+    iters::{CircleCircumferenceIter, CircleIter},
+    Rectangle, Shape,
+};
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -115,9 +118,7 @@ impl Debug for Circle {
         write!(
             f,
             "Circle {{ center: ({}, {}), radius: {} }}",
-            self.center.x,
-            self.center.y,
-            self.radius
+            self.center.x, self.center.y, self.radius
         )
     }
 }
@@ -127,9 +128,7 @@ impl Display for Circle {
         write!(
             f,
             "Circle {{\n\tcenter: ({}, {}),\n\tradius: {},\n}}",
-            self.center.x,
-            self.center.y,
-            self.radius
+            self.center.x, self.center.y, self.radius
         )
     }
 }

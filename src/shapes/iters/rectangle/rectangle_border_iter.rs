@@ -1,4 +1,4 @@
-use coord_2d::{Size, Coord};
+use coord_2d::{Coord, Size};
 
 #[derive(Debug, Clone)]
 pub struct RectangleBorderIter {

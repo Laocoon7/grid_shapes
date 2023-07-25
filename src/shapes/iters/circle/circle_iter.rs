@@ -139,4 +139,3 @@ impl Iterator for CircleIter {
         None
     }
 }
-

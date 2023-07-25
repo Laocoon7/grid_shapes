@@ -6,7 +6,7 @@ pub mod shapes;
 pub mod prelude {
     // Trait
     pub use crate::shapes::Shape;
-    
+
     // Circles
     pub use crate::shapes::Circle;
 

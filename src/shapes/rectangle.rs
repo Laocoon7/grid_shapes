@@ -89,7 +89,10 @@ impl Rectangle {
 
     /// Get the center of the rectangle
     pub fn center(self) -> Coord {
-        Coord::new((self.right() + self.left()) / 2, (self.top() + self.bottom()) / 2)
+        Coord::new(
+            (self.right() + self.left()) / 2,
+            (self.top() + self.bottom()) / 2,
+        )
     }
 
     /// Determine if the rectangle is a square

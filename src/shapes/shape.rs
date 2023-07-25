@@ -12,7 +12,7 @@ pub trait Shape:
 {
     /// Calls `f` for each Coord in the shape
     fn for_each<F: FnMut(Coord)>(self, f: F);
-    
+
     /// Returns an axis aligned bounding box containing the shape
     fn aabb(self) -> Rectangle;
 }

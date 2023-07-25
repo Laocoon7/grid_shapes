@@ -2,7 +2,6 @@ use std::ops::RangeInclusive;
 
 use coord_2d::Coord;
 
-
 #[derive(Debug, Clone)]
 pub struct LineTunnelVerticalHorizontalIter {
     start: Coord,
